@@ -1000,89 +1000,60 @@
       canvas.renderAll();
     }
 
-    // ===== 图片上传 =====
-    document.getElementById("file").addEventListener("change", (e) => {
-      if (!isAdmin) return;
+    function saveImage() {
+      if (!isAdmin) {
+        showToast("仅管理员可下载", "error");
+        return;
+      }
       
-      const file = e.target.files[0];
-      if (!file) return;
+      const link = document.createElement("a");
+      link.download = "graduation-memory-" + new Date().getTime() + ".png";
+      link.href = canvas.toDataURL();
+      link.click();
+      showToast("已下载图片", "success");
+    }
 
-      // 检查文件大小 (限制 10MB)
-      if (file.size > 10 * 1024 * 1024) {
-        showToast("文件过大，请选择小于 10MB 的图片", "error");
+    // ===== 文件处理 =====
+    function showToast(message, type = "info") {
+      const toast = document.getElementById("toast");
+      toast.textContent = message;
+      toast.className = "toast show " + type;
+      
+      setTimeout(() => {
+        toast.classList.remove("show");
+      }, 3000);
+    }
+
+    // 处理文件上传
+    document.getElementById("file").addEventListener("change", (e) => {
+      if (!isAdmin) {
+        showToast("仅管理员可上传", "error");
         return;
       }
 
-      let reader = new FileReader();
-      reader.onload = (x) => {
-        try {
-          fabric.Image.fromURL(x.target.result, (img) => {
-            loadImage(img);
-            showToast("图片已上传成功", "success");
-          }, {
-            crossOrigin: "anonymous"
+      const file = e.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const img = new Image();
+        img.onload = () => {
+          fabric.Image.fromURL(event.target.result, (fabricImg) => {
+            loadImage(fabricImg);
+            showToast("照片已加载", "success");
           });
-        } catch (err) {
-          showToast("图片加载失败���请检查格式", "error");
-        }
-      };
-      reader.onerror = () => {
-        showToast("读取文件失败", "error");
+        };
+        img.src = event.target.result;
       };
       reader.readAsDataURL(file);
     });
 
-    // ===== 下载截图 =====
-    function saveImage() {
-      try {
-        let link = document.createElement("a");
-        link.href = canvas.toDataURL({
-          format: "png",
-          quality: 1
-        });
-        link.download = `毕业纪念-${new Date().getTime()}.png`;
-        link.click();
-        showToast("截图已保存", "success");
-      } catch (err) {
-        showToast("保存失败", "error");
-      }
-    }
-
-    // ===== 工具函数 =====
-    function showToast(message, type = "info") {
-      const toast = document.getElementById("toast");
-      toast.textContent = message;
-      toast.className = "toast " + type;
-      toast.classList.add("show");
-      setTimeout(() => {
-        toast.classList.remove("show");
-      }, 2500);
-    }
-
-    // ===== 响应式处理 =====
-    window.addEventListener("resize", () => {
-      resizeCanvas();
-    });
-
-    // ===== 启动应用 =====
+    // ===== 页面初始化 =====
     window.addEventListener("DOMContentLoaded", () => {
       generateStars();
       initCanvas();
       document.getElementById("authModal").classList.add("show");
-    });
-
-    // ===== 色值更新 =====
-    document.getElementById("color").addEventListener("change", function() {
-      if (currentTool === "pen" && canvas.isDrawingMode) {
-        canvas.freeDrawingBrush.color = this.value;
-      }
-    });
-
-    // ===== 笔刷大小更新 =====
-    document.getElementById("size").addEventListener("change", function() {
-      if (canvas.freeDrawingBrush) {
-        canvas.freeDrawingBrush.width = parseInt(this.value);
-      }
+      window.addEventListener("resize", resizeCanvas);
     });
   </script>
 </body>
