@@ -114,6 +114,85 @@
       padding: 20px;
     }
 
+    /* ===== 首页入口选择 ===== */
+    .entry-selection {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 300;
+      animation: fadeIn 0.3s ease-out;
+    }
+
+    .entry-selection.hidden {
+      display: none;
+    }
+
+    .selection-card {
+      text-align: center;
+      animation: slideUp 0.5s ease-out;
+    }
+
+    .selection-card h1 {
+      font-size: 48px;
+      margin-bottom: 20px;
+      font-weight: 700;
+      background: linear-gradient(135deg, #00D4FF, #7928CA);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .selection-card p {
+      font-size: 16px;
+      color: rgba(255, 255, 255, 0.7);
+      margin-bottom: 40px;
+    }
+
+    .selection-buttons {
+      display: flex;
+      gap: 20px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .selection-btn {
+      padding: 16px 40px;
+      border-radius: 16px;
+      border: none;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.3s;
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .selection-btn-admin {
+      background: linear-gradient(135deg, #00D4FF, #7928CA);
+      color: white;
+      box-shadow: 0 10px 30px rgba(0, 212, 255, 0.3);
+    }
+
+    .selection-btn-admin:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 15px 40px rgba(0, 212, 255, 0.4);
+    }
+
+    .selection-btn-view {
+      background: rgba(255, 255, 255, 0.1);
+      color: rgba(255, 255, 255, 0.9);
+    }
+
+    .selection-btn-view:hover {
+      background: rgba(255, 255, 255, 0.15);
+      transform: translateY(-3px);
+    }
+
     /* ===== 认证模态框 ===== */
     .auth-modal {
       position: fixed;
@@ -596,6 +675,15 @@
       .auth-card h2 {
         font-size: 24px;
       }
+
+      .selection-card h1 {
+        font-size: 36px;
+      }
+
+      .selection-btn {
+        padding: 14px 30px;
+        font-size: 14px;
+      }
     }
 
     @media (max-width: 480px) {
@@ -641,6 +729,19 @@
         padding: 10px 16px;
         font-size: 11px;
       }
+
+      .selection-card h1 {
+        font-size: 28px;
+      }
+
+      .selection-buttons {
+        gap: 12px;
+      }
+
+      .selection-btn {
+        padding: 12px 24px;
+        font-size: 12px;
+      }
     }
   </style>
 </head>
@@ -661,6 +762,23 @@
     <div class="meteor"></div>
   </div>
 
+  <!-- 首页入口选择 -->
+  <div class="entry-selection" id="entrySelection">
+    <div class="selection-card">
+      <h1>✨ 欢迎来到</h1>
+      <h1>我们的青春 · 毕业纪念</h1>
+      <p>GRADUATION MEMORIAL · MEMORY BOOK</p>
+      <div class="selection-buttons">
+        <button class="selection-btn selection-btn-admin" onclick="startAdmin()">
+          🔐 管理员登录
+        </button>
+        <button class="selection-btn selection-btn-view" onclick="startView()">
+          👀 浏览模式
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- 认证模态框 -->
   <div class="auth-modal" id="authModal">
     <div class="auth-card">
@@ -673,14 +791,14 @@
         onkeypress="event.key === 'Enter' && authenticate()"
       >
       <div class="auth-buttons">
-        <button class="auth-btn auth-btn-secondary" onclick="skipAuth()">浏览</button>
+        <button class="auth-btn auth-btn-secondary" onclick="backToSelection()">返回</button>
         <button class="auth-btn auth-btn-primary" onclick="authenticate()">登录</button>
       </div>
     </div>
   </div>
 
   <!-- 内容区域 -->
-  <div class="content">
+  <div class="content" id="mainContent" style="display: none;">
     <!-- 标题 -->
     <div class="title-section">
       <h1>我们的青春 · 毕业纪念</h1>
@@ -723,7 +841,7 @@
         min="1"
         max="50"
         value="8"
-        title="笔刷大小"
+        title="笔刷大���"
       >
 
       <button class="tool" id="undoBtn" onclick="undo()" title="撤销">
@@ -763,7 +881,7 @@
 
     // ===== 配置 =====
     const CONFIG = {
-      adminPassword: "admin123",
+      adminPassword: "111",
       defaultImage: "https://images.unsplash.com/photo-1511379938547-c1f69b13d835?w=1200&h=800&fit=crop"
     };
 
@@ -773,6 +891,34 @@
     let canvas = null;
     let photo = null;
     let history = [];
+
+    // ===== 入口选择 =====
+    function startAdmin() {
+      document.getElementById("entrySelection").classList.add("hidden");
+      document.getElementById("mainContent").style.display = "flex";
+      document.getElementById("authModal").classList.add("show");
+      initCanvas();
+    }
+
+    function startView() {
+      document.getElementById("entrySelection").classList.add("hidden");
+      document.getElementById("mainContent").style.display = "flex";
+      document.getElementById("userStatus").textContent = "查看模式";
+      enableEditTools(false);
+      initCanvas();
+      showToast("已进入查看模式", "success");
+    }
+
+    function backToSelection() {
+      document.getElementById("authModal").classList.remove("show");
+      document.getElementById("entrySelection").classList.remove("hidden");
+      document.getElementById("mainContent").style.display = "none";
+      if (canvas) {
+        canvas.dispose();
+        canvas = null;
+      }
+      document.getElementById("authPassword").value = "";
+    }
 
     // ===== 生成星空 =====
     function generateStars() {
@@ -792,6 +938,8 @@
 
     // ===== 初始化 Canvas =====
     function initCanvas() {
+      if (canvas) return;
+      
       canvas = new fabric.Canvas("canvas", {
         isDrawingMode: false,
         selection: false,
@@ -802,8 +950,7 @@
       resizeCanvas();
       loadDefaultImage();
       attachCanvasEvents();
-      enableEditTools(false);
-      document.getElementById("authModal").classList.add("show");
+      generateStars();
     }
 
     function resizeCanvas() {
@@ -865,13 +1012,6 @@
       }
     }
 
-    function skipAuth() {
-      document.getElementById("authModal").classList.remove("show");
-      document.getElementById("userStatus").textContent = "查看模式";
-      enableEditTools(false);
-      showToast("已进入查看模式", "success");
-    }
-
     function logout() {
       isAdmin = false;
       document.getElementById("userStatus").textContent = "查看模式";
@@ -881,6 +1021,7 @@
       clearDraw();
       showToast("已退出登录", "success");
       document.getElementById("authPassword").value = "";
+      backToSelection();
     }
 
     function enableEditTools(enable) {
@@ -998,64 +1139,61 @@
       currentTool = null;
       updateToolButtons();
       history = [];
-      canvas.renderAll();
     }
 
-    // ===== 文件上传 =====
-    document.getElementById("file").addEventListener("change", function (e) {
+    function saveImage() {
+      if (!isAdmin) {
+        showToast("仅管理员可下载", "error");
+        return;
+      }
+      const link = document.createElement("a");
+      link.href = canvas.toDataURL("image/png");
+      link.download = "memory-book-" + new Date().toISOString().slice(0, 10) + ".png";
+      link.click();
+      showToast("已下载截图", "success");
+    }
+
+    // ===== 图片上传 =====
+    document.getElementById("file").addEventListener("change", (e) => {
+      if (!isAdmin) {
+        showToast("仅管理员可上传", "error");
+        return;
+      }
+
       const file = e.target.files[0];
-      
       if (!file) return;
 
       const reader = new FileReader();
-      reader.onload = function (event) {
+      reader.onload = (event) => {
         fabric.Image.fromURL(event.target.result, (img) => {
           loadImage(img);
-          showToast("照片已上传", "success");
-        }, {
-          crossOrigin: "anonymous"
+          showToast("图片已加载", "success");
         });
       };
       reader.readAsDataURL(file);
     });
 
-    // ===== 保存图片 =====
-    function saveImage() {
-      if (!isAdmin) {
-        showToast("仅管理员可保存", "error");
-        return;
-      }
-      
-      const link = document.createElement("a");
-      link.download = "memory-book.png";
-      link.href = canvas.toDataURL();
-      link.click();
-      showToast("已下载截图", "success");
-    }
-
     // ===== 提示信息 =====
-    function showToast(message, type = "success") {
+    function showToast(message, type = "info") {
       const toast = document.getElementById("toast");
       toast.textContent = message;
-      toast.className = `toast show ${type}`;
+      toast.className = "toast show " + type;
       
       setTimeout(() => {
         toast.classList.remove("show");
-      }, 2000);
+      }, 3000);
     }
 
     // ===== 初始化 =====
     window.addEventListener("load", () => {
       generateStars();
-      initCanvas();
     });
 
     window.addEventListener("resize", () => {
-      if (canvas) {
+      if (canvas && document.getElementById("mainContent").style.display !== "none") {
         resizeCanvas();
       }
     });
   </script>
 </body>
-
 </html>
