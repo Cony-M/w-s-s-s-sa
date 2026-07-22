@@ -88,7 +88,7 @@
         opacity: 1;
       }
       100% {
-        transform: translateY(100vh) translateX(-200px);
+        transform: translateY(100vh) translateX(200px);
         opacity: 0;
       }
     }
@@ -803,6 +803,7 @@
       loadDefaultImage();
       attachCanvasEvents();
       enableEditTools(false);
+      document.getElementById("authModal").classList.add("show");
     }
 
     function resizeCanvas() {
@@ -843,6 +844,7 @@
 
       canvas.add(img);
       canvas.sendToBack(img);
+      canvas.renderAll();
     }
 
     // ===== 认证系统 =====
@@ -889,7 +891,6 @@
       });
 
       document.getElementById("file").disabled = !enable;
-      document.getElementById("uploadLabel").classList.toggle("disabled", !enable);
     }
 
     // ===== Canvas 事件 =====
@@ -1000,61 +1001,61 @@
       canvas.renderAll();
     }
 
-    function saveImage() {
-      if (!isAdmin) {
-        showToast("仅管理员可下载", "error");
-        return;
-      }
-      
-      const link = document.createElement("a");
-      link.download = "graduation-memory-" + new Date().getTime() + ".png";
-      link.href = canvas.toDataURL();
-      link.click();
-      showToast("已下载图片", "success");
-    }
-
-    // ===== 文件处理 =====
-    function showToast(message, type = "info") {
-      const toast = document.getElementById("toast");
-      toast.textContent = message;
-      toast.className = "toast show " + type;
-      
-      setTimeout(() => {
-        toast.classList.remove("show");
-      }, 3000);
-    }
-
-    // 处理文件上传
-    document.getElementById("file").addEventListener("change", (e) => {
-      if (!isAdmin) {
-        showToast("仅管理员可上传", "error");
-        return;
-      }
-
+    // ===== 文件上传 =====
+    document.getElementById("file").addEventListener("change", function (e) {
       const file = e.target.files[0];
+      
       if (!file) return;
 
       const reader = new FileReader();
-      reader.onload = (event) => {
-        const img = new Image();
-        img.onload = () => {
-          fabric.Image.fromURL(event.target.result, (fabricImg) => {
-            loadImage(fabricImg);
-            showToast("照片已加载", "success");
-          });
-        };
-        img.src = event.target.result;
+      reader.onload = function (event) {
+        fabric.Image.fromURL(event.target.result, (img) => {
+          loadImage(img);
+          showToast("照片已上传", "success");
+        }, {
+          crossOrigin: "anonymous"
+        });
       };
       reader.readAsDataURL(file);
     });
 
-    // ===== 页面初始化 =====
-    window.addEventListener("DOMContentLoaded", () => {
+    // ===== 保存图片 =====
+    function saveImage() {
+      if (!isAdmin) {
+        showToast("仅管理员可保存", "error");
+        return;
+      }
+      
+      const link = document.createElement("a");
+      link.download = "memory-book.png";
+      link.href = canvas.toDataURL();
+      link.click();
+      showToast("已下载截图", "success");
+    }
+
+    // ===== 提示信息 =====
+    function showToast(message, type = "success") {
+      const toast = document.getElementById("toast");
+      toast.textContent = message;
+      toast.className = `toast show ${type}`;
+      
+      setTimeout(() => {
+        toast.classList.remove("show");
+      }, 2000);
+    }
+
+    // ===== 初始化 =====
+    window.addEventListener("load", () => {
       generateStars();
       initCanvas();
-      document.getElementById("authModal").classList.add("show");
-      window.addEventListener("resize", resizeCanvas);
+    });
+
+    window.addEventListener("resize", () => {
+      if (canvas) {
+        resizeCanvas();
+      }
     });
   </script>
 </body>
+
 </html>
