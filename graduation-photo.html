@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>2026届高三(5)班 - 毕业合照展示</title>
+  <script src="https://cdn.jsdelivr.net/npm/fabric@5.3.1/dist/fabric.min.js"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      width: 100%;
+      min-height: 100vh;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", sans-serif;
+      color: #333;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 40px 20px;
+    }
+
+    /* 顶部标题区域 */
+    .header {
+      text-align: center;
+      margin-bottom: 50px;
+      color: white;
+      animation: slideDown 0.6s ease-out;
+    }
+
+    @keyframes slideDown {
+      from {
+        opacity: 0;
+        transform: translateY(-30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .header h1 {
+      font-size: 48px;
+      margin-bottom: 10px;
+      text-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+      font-weight: 700;
+    }
+
+    .header p {
+      font-size: 18px;
+      opacity: 0.9;
+      margin-bottom: 5px;
+    }
+
+    .header .subtitle {
+      font-size: 14px;
+      opacity: 0.8;
+      margin-top: 10px;
+    }
+
+    /* 主内容区域 */
+    .content-wrapper {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 40px;
+      align-items: center;
+      margin-bottom: 60px;
+    }
+
+    .photo-section {
+      background: white;
+      border-radius: 20px;
+      padding: 20px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      animation: slideUp 0.6s ease-out 0.1s both;
+      overflow: hidden;
+    }
+
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .photo-section img {
+      width: 100%;
+      height: auto;
+      border-radius: 16px;
+      display: block;
+      transition: transform 0.3s ease;
+    }
+
+    .photo-section:hover img {
+      transform: scale(1.02);
+    }
+
+    .info-section {
+      color: white;
+      animation: slideUp 0.6s ease-out 0.2s both;
+    }
+
+    .info-card {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      padding: 25px;
+      border-radius: 16px;
+      margin-bottom: 20px;
+      transition: all 0.3s ease;
+    }
+
+    .info-card:hover {
+      background: rgba(255, 255, 255, 0.15);
+      transform: translateX(10px);
+    }
+
+    .info-card h3 {
+      font-size: 18px;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .info-card p {
+      font-size: 14px;
+      opacity: 0.9;
+      line-height: 1.6;
+    }
+
+    .icon {
+      width: 24px;
+      height: 24px;
+    }
+
+    /* 班级成员网格 */
+    .members-section {
+      background: white;
+      border-radius: 20px;
+      padding: 40px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      animation: slideUp 0.6s ease-out 0.3s both;
+      margin-bottom: 60px;
+    }
+
+    .members-section h2 {
+      text-align: center;
+      font-size: 36px;
+      margin-bottom: 40px;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .members-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+      gap: 15px;
+    }
+
+    .member-item {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      padding: 15px;
+      border-radius: 12px;
+      text-align: center;
+      color: white;
+      font-size: 12px;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+
+    .member-item:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+    }
+
+    /* 时间线 */
+    .timeline-section {
+      background: white;
+      border-radius: 20px;
+      padding: 40px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      margin-bottom: 60px;
+      animation: slideUp 0.6s ease-out 0.4s both;
+    }
+
+    .timeline-section h2 {
+      text-align: center;
+      font-size: 36px;
+      margin-bottom: 40px;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .timeline {
+      position: relative;
+      padding: 20px 0;
+    }
+
+    .timeline::before {
+      content: "";
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 4px;
+      height: 100%;
+      background: linear-gradient(180deg, #667eea, #764ba2);
+    }
+
+    .timeline-item {
+      margin-bottom: 40px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      align-items: center;
+    }
+
+    .timeline-item:nth-child(odd) .timeline-content {
+      grid-column: 1;
+      text-align: right;
+      padding-right: 50px;
+    }
+
+    .timeline-item:nth-child(odd) .timeline-dot {
+      grid-column: 2;
+      justify-self: start;
+    }
+
+    .timeline-item:nth-child(even) .timeline-content {
+      grid-column: 2;
+      text-align: left;
+      padding-left: 50px;
+    }
+
+    .timeline-item:nth-child(even) .timeline-dot {
+      grid-column: 1;
+      justify-self: end;
+    }
+
+    .timeline-content {
+      background: #f8f9fa;
+      padding: 20px;
+      border-radius: 12px;
+      border-left: 4px solid #667eea;
+    }
+
+    .timeline-item:nth-child(even) .timeline-content {
+      border-left: none;
+      border-right: 4px solid #667eea;
+    }
+
+    .timeline-content h4 {
+      color: #667eea;
+      margin-bottom: 8px;
+      font-size: 16px;
+    }
+
+    .timeline-content p {
+      color: #666;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .timeline-dot {
+      width: 20px;
+      height: 20px;
+      background: white;
+      border: 4px solid #667eea;
+      border-radius: 50%;
+      position: relative;
+      z-index: 10;
+    }
+
+    /* 统计区域 */
+    .stats-section {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+      margin-bottom: 60px;
+    }
+
+    .stat-card {
+      background: white;
+      padding: 30px;
+      border-radius: 16px;
+      text-align: center;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      animation: slideUp 0.6s ease-out both;
+    }
+
+    .stat-card:nth-child(1) { animation-delay: 0.5s; }
+    .stat-card:nth-child(2) { animation-delay: 0.6s; }
+    .stat-card:nth-child(3) { animation-delay: 0.7s; }
+
+    .stat-number {
+      font-size: 48px;
+      font-weight: 700;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 10px;
+    }
+
+    .stat-label {
+      font-size: 16px;
+      color: #666;
+      font-weight: 600;
+    }
+
+    /* 底部 */
+    .footer {
+      text-align: center;
+      color: white;
+      padding: 30px 20px;
+      font-size: 14px;
+      opacity: 0.8;
+    }
+
+    /* 响应式 */
+    @media (max-width: 1024px) {
+      .content-wrapper {
+        grid-template-columns: 1fr;
+      }
+
+      .timeline::before {
+        left: 10px;
+      }
+
+      .timeline-item {
+        grid-template-columns: 1fr;
+      }
+
+      .timeline-item:nth-child(odd),
+      .timeline-item:nth-child(even) {
+        grid-template-columns: 30px 1fr;
+      }
+
+      .timeline-item:nth-child(odd) .timeline-content,
+      .timeline-item:nth-child(even) .timeline-content {
+        grid-column: 2;
+        text-align: left;
+        padding-left: 30px;
+        padding-right: 0;
+        border-left: 4px solid #667eea;
+        border-right: none;
+      }
+
+      .timeline-item:nth-child(odd) .timeline-dot,
+      .timeline-item:nth-child(even) .timeline-dot {
+        grid-column: 1;
+        justify-self: center;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .header h1 {
+        font-size: 32px;
+      }
+
+      .members-grid {
+        grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+      }
+
+      .stats-section {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <!-- 顶部标题 -->
+    <div class="header">
+      <h1>✨ 2026届高三(5)班 毕业合照</h1>
+      <p>通山县粳新学校 HIGH SCHOOL CLASS OF 2026</p>
+      <p class="subtitle">GRADUATION MEMORIAL · MEMORY BOOK</p>
+    </div>
+
+    <!-- 主内容 -->
+    <div class="content-wrapper">
+      <!-- 合照 -->
+      <div class="photo-section">
+        <img src="https://images.githubusercontent.com/u/1308525049?s=400&u=graduation-photo-2026" alt="2026届高三(5)班合照" 
+             onerror="this.src='https://via.placeholder.com/600x400/667eea/ffffff?text=毕业合照'">
+      </div>
+
+      <!-- 信息卡片 -->
+      <div class="info-section">
+        <div class="info-card">
+          <h3>
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm3.5-9c.83 0 1.5-.67 1.5-1.5S16.33 8 15.5 8 14 8.67 14 9.5s.67 1.5 1.5 1.5zm-7 0c.83 0 1.5-.67 1.5-1.5S9.33 8 8.5 8 7 8.67 7 9.5 7.67 11 8.5 11zm3.5 6.5c2.33 0 4.31-1.46 5.11-3.5H6.89c.8 2.04 2.78 3.5 5.11 3.5z"/>
+            </svg>
+            班级概况
+          </h3>
+          <p>通山县粳新学校 2026 届高三(5)班全体师生合影留念</p>
+        </div>
+
+        <div class="info-card">
+          <h3>
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
+            </svg>
+            拍摄时间
+          </h3>
+          <p>2026年5月</p>
+        </div>
+
+        <div class="info-card">
+          <h3>
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm.5-13h-1v6l5.25 3.15.75-1.23-4-2.42z"/>
+            </svg>
+            纪念意义
+          </h3>
+          <p>记录青春岁月，珍藏集体回忆，见证成长时刻</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 班级成员 -->
+    <div class="members-section">
+      <h2>👥 班级成员</h2>
+      <div class="members-grid">
+        <div class="member-item">徐志航 (班长)</div>
+        <div class="member-item">程 翔</div>
+        <div class="member-item">孔小溪</div>
+        <div class="member-item">陈奉希</div>
+        <div class="member-item">许雄飞</div>
+        <div class="member-item">程吉辉</div>
+        <div class="member-item">成千涛</div>
+        <div class="member-item">周文鑫</div>
+        <div class="member-item">吴我维</div>
+        <div class="member-item">朱奥矩</div>
+        <div class="member-item">刘 仙</div>
+        <div class="member-item">陈 铭</div>
+
+        <div class="member-item">王豪宾 (副班长)</div>
+        <div class="member-item">陈俊彪</div>
+        <div class="member-item">吴 郑</div>
+        <div class="member-item">夏炀朋</div>
+        <div class="member-item">吴 珊</div>
+        <div class="member-item">谭雅玉</div>
+        <div class="member-item">方宝仪</div>
+        <div class="member-item">胡娇娇</div>
+        <div class="member-item">徐依依</div>
+        <div class="member-item">萌 悦</div>
+        <div class="member-item">沈可体</div>
+        <div class="member-item">能 钰</div>
+
+        <div class="member-item">李佳怡</div>
+        <div class="member-item">谭琴君</div>
+        <div class="member-item">石溧溧</div>
+        <div class="member-item">张样溪</div>
+        <div class="member-item">廖 艳</div>
+        <div class="member-item">张雨朵</div>
+        <div class="member-item">陈 橙</div>
+        <div class="member-item">罗 佳</div>
+        <div class="member-item">李铭惠</div>
+        <div class="member-item">舒姆婷</div>
+        <div class="member-item">曾明昱</div>
+        <div class="member-item">吴琴婷</div>
+
+        <div class="member-item">吴业鑫</div>
+        <div class="member-item">汪子烨</div>
+        <div class="member-item">阮银钦</div>
+        <div class="member-item">朱 阴</div>
+        <div class="member-item">许心怡</div>
+        <div class="member-item">徐 梅</div>
+        <div class="member-item">郑 菲</div>
+        <div class="member-item">李津津</div>
+        <div class="member-item">华兴风</div>
+        <div class="member-item">谢繁杉</div>
+        <div class="member-item">徐盼盼</div>
+        <div class="member-item">许仙受</div>
+
+        <div class="member-item">赵 呵</div>
+        <div class="member-item">熊 伟</div>
+        <div class="member-item">徐维发</div>
+        <div class="member-item">曾志华</div>
+        <div class="member-item">成 泉</div>
+        <div class="member-item">阮俊长</div>
+        <div class="member-item">王国华</div>
+        <div class="member-item">阮忆涛</div>
+        <div class="member-item">陈 阳</div>
+        <div class="member-item">向 评</div>
+        <div class="member-item">陈邦杰</div>
+      </div>
+    </div>
+
+    <!-- 统计数据 -->
+    <div class="stats-section">
+      <div class="stat-card">
+        <div class="stat-number">67+</div>
+        <div class="stat-label">班级总人数</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number">2026</div>
+        <div class="stat-label">毕业年份</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number">∞</div>
+        <div class="stat-label">青春回忆</div>
+      </div>
+    </div>
+
+    <!-- 时间线 -->
+    <div class="timeline-section">
+      <h2>📅 班级时间线</h2>
+      <div class="timeline">
+        <div class="timeline-item">
+          <div class="timeline-content">
+            <h4>2023年9月</h4>
+            <p>踏入高中校园，开启三年青春之旅</p>
+          </div>
+          <div class="timeline-dot"></div>
+        </div>
+
+        <div class="timeline-item">
+          <div class="timeline-content">
+            <h4>2024年6月</h4>
+            <p>高一学年圆满结束，班级初具凝聚力</p>
+          </div>
+          <div class="timeline-dot"></div>
+        </div>
+
+        <div class="timeline-item">
+          <div class="timeline-content">
+            <h4>2024年9月</h4>
+            <p>迎来高二新学年，班级文化日益浓厚</p>
+          </div>
+          <div class="timeline-dot"></div>
+        </div>
+
+        <div class="timeline-item">
+          <div class="timeline-content">
+            <h4>2025年6月</h4>
+            <p>高二学年完美收官，为高三冲刺做准备</p>
+          </div>
+          <div class="timeline-dot"></div>
+        </div>
+
+        <div class="timeline-item">
+          <div class="timeline-content">
+            <h4>2025年9月</h4>
+            <p>高三启航，全班同学奋力拼搏，携手共进</p>
+          </div>
+          <div class="timeline-dot"></div>
+        </div>
+
+        <div class="timeline-item">
+          <div class="timeline-content">
+            <h4>2026年5月</h4>
+            <p>高考落幕，同学们展望美好未来，记录青春瞬间</p>
+          </div>
+          <div class="timeline-dot"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 底部 -->
+  <div class="footer">
+    <p>© 2026 通山县粳新学校 高三(5)班 毕业纪念</p>
+    <p>让我们珍藏这份青春回忆，祝福所有同学的美好未来！</p>
+  </div>
+
+  <script>
+    lucide.createIcons();
+  </script>
+</body>
+
+</html>
